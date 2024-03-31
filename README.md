@@ -12,25 +12,6 @@ ABOUT THE DATA
 
 This dataset contains sales transactions from a three different branches of Walmart, respectively located in Mandalay, Yangon and Naypyitaw. The data contains 17 columns and 995 rows.
 
-Column	Data Type
-Invoice_id	VARCHAR(30)
-Branch	VARCHAR(5)
-City	VARCHAR(30)
-Customer_type	VARCHAR(30)
-Gender	VARCHAR(10)
-Product_line	VARCHAR(100)
-Unit_price	DECIMAL(10, 2)
-Quantity	INT
-VAT	FLOAT(6, 4)
-Total	DECIMAL(10, 2)
-Date	DATE
-Time	TIMESTAMP
-Payment_method	DECIMAL(10, 2)
-COG	DECIMAL(10, 2)
-Gross_margin_percentage	FLOAT(11, 9)
-Gross_income	DECIMAL(10, 2)
-Rating	FLOAT(2, 1)
-
 Approach Used
 
 1.	Data Wrangling: This is the first step where inspection of data is done to make sure NULL values, missing values are detected, and data replacement methods are used to replace, missing or NULL values.
