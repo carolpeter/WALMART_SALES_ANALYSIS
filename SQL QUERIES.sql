@@ -1,0 +1,317 @@
+USE WALMART_SALES;
+CREATE TABLE SALES ( 
+INVOICE_ID varchar(50), 
+BRANCH VARCHAR(5), 
+CITY VARCHAR(30), 
+CUSTOMER_TYPE varchar(30), 
+GENDER varchar(10), 
+PRODUCT_LINE varchar(100), 
+UNIT_PRICE decimal(10, 2), 
+QUANTITY INT, 
+VAT float(6, 4), 
+TOTAL decimal(12, 4), 
+DATE datetime, 
+TIME time, 
+PAYMENT_METHOD varchar(15), 
+COG decimal(10, 2), 
+GROSS_MARGIN float(11, 9), 
+GROSS_INCOME decimal(12, 4), 
+RATING float(2, 1) 
+)
+
+---FEATURE ENGINEERING---
+
+USE WALMART_SALES;
+SELECT *
+FROM SALES
+
+
+
+SELECT
+TIME,
+CASE 
+WHEN TIME BETWEEN "00:00:00" AND "12:00:00" THEN 'MORNING'
+WHEN TIME BETWEEN "12:00:01" AND "16:00:00" THEN 'AFTERNOON'
+ELSE 'EVENING'
+ END AS TIME_OF_DAY
+FROM SALES
+
+ALTER TABLE SALES ADD COLUMN TIME_OF_DAY VARCHAR(20)
+
+UPDATE SALES
+SET TIME_OF_DAY =(
+CASE 
+WHEN TIME BETWEEN "00:00:00" AND "12:00:00" THEN 'MORNING'
+WHEN TIME BETWEEN "12:00:01" AND "16:00:00" THEN 'AFTERNOON'
+ELSE 'EVENING'
+ END
+ );
+ 
+-----
+
+ SELECT
+DATE,
+dayname(DATE) AS DAY_NAME
+FROM SALES
+
+ALTER TABLE SALES ADD COLUMN DAY_NAME VARCHAR(10);
+
+UPDATE SALES
+SET  DAY_NAME = dayname(DATE)
+
+---MONTH_NAME
+
+SELECT
+DATE,
+MONTHNAME(DATE) AS MONTH_NAME
+FROM SALES
+
+ALTER TABLE SALES ADD COLUMN MONTH_NAME VARCHAR(10);
+
+UPDATE SALES
+SET MONTH_NAME = monthname(DATE)
+
+
+       GENERIC QUESTIONS
+1.	How many unique cities does the data have?
+
+SELECT
+DISTINCT CITY
+FROM SALES
+
+2.	In which city is each branch?
+
+SELECT
+DISTINCT CITY,
+ BRANCH
+FROM SALES
+
+             Product
+1.	How many unique product lines does the data have?
+
+SELECT
+COUNT(DISTINCT PRODUCT_LINE)
+FROM SALES
+
+2.	What is the most common payment method?
+
+SELECT
+PAYMENT_METHOD,
+COUNT(PAYMENT_METHOD)
+FROM SALES
+GROUP BY PAYMENT_METHOD
+
+3.	What is the most selling product line?
+
+SELECT
+PRODUCT_LINE,
+COUNT(PRODUCT_LINE) AS CNT
+FROM SALES
+GROUP BY PRODUCT_LINE
+ORDER BY CNT DESC;
+
+OR
+
+SELECT
+PRODUCT_LINE,
+COUNT(PRODUCT_LINE)
+FROM SALES
+GROUP BY PRODUCT_LINE
+
+
+4.	What is the total revenue by month?
+
+SELECT 
+MONTH_NAME,
+SUM(TOTAL)
+FROM SALES
+GROUP BY MONTH_NAME
+
+
+5.	What month had the largest COGS?
+
+SELECT
+MONTH_NAME,
+SUM(COG) AS COGS
+FROM SALES
+GROUP BY MONTH_NAME
+ORDER BY COGS;
+
+
+6.	What product line had the largest revenue?
+
+SELECT
+PRODUCT_LINE,
+SUM(TOTAL) AS GROSS_INCOME
+FROM SALES
+GROUP BY PRODUCT_LINE
+ORDER BY GROSS_INCOME DESC
+
+7.	What is the city with the largest revenue?
+
+SELECT
+CITY,
+SUM(TOTAL) AS GROSS_INCOME
+FROM SALES
+GROUP BY CITY
+ORDER BY GROSS_INCOME DESC
+
+8.	What product line had the largest VAT?
+
+SELECT
+PRODUCT_LINE,
+AVG(VAT) AS VAT
+FROM SALES
+GROUP BY PRODUCT_LINE
+ORDER BY VAT DESC
+
+9.	Fetch each product line and add a column to those product line showing "Good", "Bad". Good if its greater than average sales
+
+
+
+10.	Which branch sold more products than average product sold?
+
+SELECT
+BRANCH,
+SUM(QUANTITY)
+FROM SALES
+GROUP BY BRANCH
+HAVING SUM(QUANTITY) > (SELECT AVG(QUANTITY) FROM SALES);
+
+11.	What is the most common product line by gender?
+
+SELECT
+GENDER,
+PRODUCT_LINE,
+COUNT(GENDER) AS TOTAL_CNT
+FROM SALES
+GROUP BY GENDER, PRODUCT_LINE
+ORDER BY TOTAL_CNT DESC
+
+12.	What is the average rating of each product line?
+
+SELECT 
+AVG(RATING) AS AVG_RATING,
+PRODUCT_LINE
+FROM SALES
+GROUP BY PRODUCT_LINE
+ORDER BY AVG_RATING DESC
+
+Sales
+Number of sales made in each time of the day per weekday
+
+SELECT 
+TIME_OF_DAY,
+COUNT(*) AS TOTAL_SALES
+FROM SALES
+WHERE DAY_NAME = "MONDAY"
+GROUP BY TIME_OF_DAY
+
+Which of the customer types brings the most revenue?
+
+SELECT
+CUSTOMER_TYPE,
+SUM(TOTAL) AS GROSS_INCOME
+FROM SALES
+GROUP BY CUSTOMER_TYPE
+
+Which city has the largest tax percent/ VAT (Value Added Tax)?
+
+SELECT
+ CITY,
+ AVG(VAT)
+ FROM SALES
+ GROUP BY CITY
+ 
+Which customer type pays the most in VAT?
+
+SELECT
+CUSTOMER_TYPE,
+AVG(VAT)
+FROM SALES
+GROUP BY CUSTOMER_TYPE
+
+
+Customer
+How many unique customer types does the data have?
+
+SELECT
+DISTINCT CUSTOMER_TYPE
+FROM SALES;
+
+How many unique payment methods does the data have?
+
+SELECT
+DISTINCT PAYMENT_METHOD
+FROM SALES;
+
+What is the most common customer type?
+
+SELECT
+CUSTOMER_TYPE,
+COUNT(TOTAL) CUSTOMER_TYPE
+FROM SALES
+GROUP BY CUSTOMER_TYPE
+
+Which customer type buys the most?
+
+SELECT
+CUSTOMER_TYPE,
+COUNT(TOTAL) CUSTOMER_TYPE
+FROM SALES
+GROUP BY CUSTOMER_TYPE
+
+What is the gender of most of the customers?
+
+SELECT
+GENDER,
+COUNT(TOTAL) GENDER
+FROM SALES
+GROUP BY GENDER
+
+What is the gender distribution per branch?
+
+SELECT
+GENDER,
+COUNT(TOTAL) GENDER
+FROM SALES
+WHERE BRANCH = "A"
+GROUP BY GENDER
+
+Which time of the day do customers give most ratings?
+
+SELECT
+TIME_OF_DAY,
+AVG(RATING) AS AVG_RATING
+FROM SALES
+GROUP BY TIME_OF_DAY
+
+Which time of the day do customers give most ratings per branch?
+
+SELECT
+TIME_OF_DAY,
+AVG(RATING) AS AVG_RATING
+FROM SALES
+WHERE BRANCH = "A"
+GROUP BY TIME_OF_DAY
+ORDER BY AVG_RATING DESC
+
+Which day fo the week has the best avg ratings?
+
+SELECT
+DAY_NAME,
+AVG(RATING) AS AVG_RATING
+FROM SALES
+GROUP BY DAY_NAME
+ORDER BY AVG_RATING DESC;
+
+Which day of the week has the best average ratings per branch?
+
+SELECT
+DAY_NAME,
+AVG(RATING) AS AVG_RATING
+FROM SALES
+WHERE BRANCH ="A"
+GROUP BY DAY_NAME
+ORDER BY AVG_RATING DESC;
+
